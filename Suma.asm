@@ -18,4 +18,5 @@ mov bh,37h
 add al,bh
 
 
-sub al,ah; al minuendo, ah sustraendo
+sub al,ah; al minuendo, ah sustraendo, para todos los valores earitméticos restarle 30h para poder hacerlos decimal
+
