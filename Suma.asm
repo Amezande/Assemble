@@ -54,3 +54,5 @@ int 21h
 mov ah,02
 mov dl,03h
 int 21h 
+
+//sumas y restas en bnario y hexadecimal desde uno a 16 bits, de 1 a 4 caracteres 
