@@ -34,7 +34,7 @@ int 21h
 mov al,3 
 mov ah,7
 mov bl,10d
-mov bh,37h
+mov bh,37h // para poder suamr en ensabmlador tenemos que convetir
 
 
 add al,bh 
