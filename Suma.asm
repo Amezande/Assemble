@@ -1,7 +1,7 @@
-mov ah,01
+mov ah,01; agregar
 int 21h
 
-mov ah,02
+mov ah,02 ; imprimir
 mov dl,"+"
 int 21h
        
