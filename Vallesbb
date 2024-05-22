@@ -1,0 +1,86 @@
+modvid macro
+     ;Activa modo de video
+    MOV AH,00h  
+	MOV AL,03h
+ 	INT 10h 
+endm
+
+limpant macro
+    mov ah,0fh
+    int 10
+    mov ah,0
+    int 10h
+endm 
+
+inicia macro 
+    mov ax,data
+    mov ds,ax
+    mov dx,offset titulo
+    mov ah,09
+    int 21h
+endm
+      
+menu macro 
+     mov dx,offset titulo
+     mov ah,09
+     int 21h 
+     
+     mov dx,offset op1
+     mov ah,09 
+     int 21h    
+    
+     mov dx,offset op2
+     mov ah,09 
+     int 21h 
+    
+     mov dx,offset op3
+     mov ah,09 
+     int 21h 
+    
+     mov dx,offset op4
+     mov ah,09 
+     int 21h   
+    
+     mov dx,offset op5
+     mov ah,09 
+     int 21h   
+            
+    
+     mov dx,offset op6
+     mov ah,09 
+     int 21h 
+endm
+
+entrada macro     
+    mov ah,01
+    mov ch,ah
+    int 21h 
+endm 
+.model small 
+.stack 
+.data
+
+    titulo db '          MENU          ',10,13,'$'
+    op1 db 'Calculadora de: +,-,*,/',10,13,'$'
+    op2 db '1) Suma',10,13,'$'   
+    op3 db '2) Resta',10,13,'$'
+    op4 db '3) Multiplicacion',10,13,'$'
+    op5 db '4) Division',10,13,10,'$'
+    op6 db '¿Que operacion desea hacer?:$'  
+    
+    
+.code
+    begin:  
+    
+     inicia
+     modvid
+     menu 
+     entrada
+                  
+    
+ 
+     int 21h             
+     mov ah,4ch 
+     int 21h  
+    
+    end begin 
