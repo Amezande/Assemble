@@ -1,5 +1,5 @@
-modvid macro
-     ;Activa modo de video
+;----------LIMPIA PANTALLAS------------------
+modvid macro  
     MOV AH,00h  
 	MOV AL,03h
  	INT 10h 
@@ -7,80 +7,437 @@ endm
 
 limpant macro
     mov ah,0fh
-    int 10
+    int 10h
     mov ah,0
     int 10h
-endm 
+endm  
 
-inicia macro 
-    mov ax,data
-    mov ds,ax
-    mov dx,offset titulo
-    mov ah,09
-    int 21h
-endm
-      
-menu macro 
-     mov dx,offset titulo
-     mov ah,09
-     int 21h 
-     
-     mov dx,offset op1
-     mov ah,09 
-     int 21h    
-    
-     mov dx,offset op2
-     mov ah,09 
-     int 21h 
-    
-     mov dx,offset op3
-     mov ah,09 
-     int 21h 
-    
-     mov dx,offset op4
-     mov ah,09 
-     int 21h   
-    
-     mov dx,offset op5
-     mov ah,09 
-     int 21h   
+;----------------MENUS-----------------------
+menu macro
             
-    
-     mov dx,offset op6
-     mov ah,09 
-     int 21h 
+
 endm
 
-entrada macro     
-    mov ah,01
-    mov ch,ah
-    int 21h 
-endm 
+;-------------codigo________________________
+
 .model small 
 .stack 
 .data
-
+    endChoice db ?
+    
+    endPrompt  db '¨Desea continuar?',10,13,'      1.Si 2.No   $'
+    
+    num1 db ?
+    num2 db ? 
+    result db 0  
+        
+    invalid db 'Numero invalido. Por favor, intenta de nuevo.$'
+    
+    num db ?
+     
+    espacio db ' ',10,13,'$'
+    
     titulo db '          MENU          ',10,13,'$'
-    op1 db 'Calculadora de: +,-,*,/',10,13,'$'
+    op1 db 'Calculadora de: +,-,*',10,13,'$'
     op2 db '1) Suma',10,13,'$'   
     op3 db '2) Resta',10,13,'$'
-    op4 db '3) Multiplicacion',10,13,'$'
-    op5 db '4) Division',10,13,10,'$'
-    op6 db '¿Que operacion desea hacer?:$'  
+    op4 db '3) Multiplicacion',10,13,10,'$'
+    op5 db '¨Que operacion desea hacer?: $'
+    
+    titS   db '1.Suma',10,13,'$'
+    titR   db '2.Resta',10,13,'$'
+    titM   db '3.Multiplicacion',10,13,'$'
     
     
+    op1_1  db 'Deme el primer numero: $'
+    op2_1  db 'Deme el segundo numero: $'                                                 
+    op3_1  db 'Resultado= $'
+    n1 db 0    ;variable para almacenar el numero de ops
+    n2 db 0    ;variable para segundo numero (solo con este formato NO tocar)
 .code
-    begin:  
+   main proc  
     
-     inicia
+    
+    menu
+    mov ax,data
+     mov ds,ax
+     mov dx,offset titulo
+     mov ah,09h
+     int 21h 
+
+     mov dx,offset op1
+     mov ah,09h 
+     int 21h    
+
+     mov dx,offset op2
+     mov ah,09h 
+     int 21h 
+
+     mov dx,offset op3
+     mov ah,09h 
+     int 21h 
+
+     mov dx,offset op4
+     mov ah,09h 
+     int 21h   
+
+     mov dx,offset op5
+     mov ah,09h 
+     int 21h
+     
+     start:
+     ; Leer el numero del usuario
+     mov ah, 01h
+     int 21h
+     sub al, '0'  
+     mov num, al
+
+     ; Verificar el numero ingresado
+     cmp num, 1
+     je part1
+     cmp num, 2
+     je part2
+     cmp num, 3
+     je part3
+     jmp fin
+
+     ; Si el numero es invalido, imprimir el mensaje de error y volver a empezar
+     mov ah, 09h
+     lea dx, invalid
+     int 21h
+     jmp start 
+     
+
+part1:
+     ;limpiapantallas 
      modvid
-     menu 
-     entrada
-                  
-    
- 
-     int 21h             
-     mov ah,4ch 
+     limpant
+     ;muestra menu suma
+     mov dx,offset titS
+     mov ah,09
+     int 21h 
+     
+     mov dx,offset op1_1
+     mov ah,09 
+     int 21h   
+     
+     ;----- num1   
+      ; Lee el primer dígito (unidades)
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    sub al, '0' ; Convierte el carácter a número
+    mov n1, al
+
+    ; Multiplica el número por 10 (parte de las decenas)
+    mov ah, 0
+    mov al, 10
+    mul n1
+    mov n1, al
+
+    ; Lee el segundo dígito (decenas)
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    sub al, '0' ; Convierte el carácter a número
+
+    ; Suma las partes de las decenas y unidades;+++++++++++++++++++
+    add n1, al
+
+    ; Muestra el número ingresado
+    mov ah, 2
+    mov dl, n1                               ;++++++++++++++++++++
+    add dl, '0' ; Convierte el número a carácter
+   ; int 21h
+     ;------ 
+     
+     ;deja un spacio
+     mov dx,offset espacio
+     mov ah,09 
      int 21h  
+      
+     ;limpia registro 
+      mov ax,0   
+    mov bx,0 
+    mov cx,0 
+    mov dx,0
     
-    end begin 
+     mov dx,offset op2_1
+     mov ah,09 
+     int 21h 
+     ;pide segundo numero
+    ;------num2
+    
+     
+      ; Lee el primer dígito (unidades) 
+      
+      
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    sub al, '0' ; Convierte el carácter a número
+    mov n2, al
+
+    ; Multiplica el número por 10 (parte de las decenas)
+    mov ah, 0
+    mov al, 10
+    mul n2 
+    sub ax,3030h; ajuste decimal
+    mov n2, al
+
+    ; Lee el segundo dígito (decenas)
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    ;sub al, '0' ; Convierte el carácter a número
+
+    ; Suma las partes de las decenas y unidades;+++++++++++++++++++
+    add n2, al
+
+    ; Muestra el número ingresado
+    mov ah, 2
+    mov dl, n2                               ;++++++++++++++++++++
+   ; add dl, '0' ; Convierte el número a carácter
+   ; int 21h
+    
+     ;---------
+     ;deja un espacio
+     mov dx,offset espacio
+     mov ah,09 
+     int 21h   
+     ;muestra resultado
+     mov dx,offset op3_1
+     mov ah,09 
+     int 21h 
+     
+     
+     mov al,num1
+     add al,num2
+     mov result,al
+     ;add result, '0' 
+     ;add ax,3030h
+     mov dl,result
+     mov ah,02h
+     int 21h
+     ;deja un espacio
+     mov dx,offset espacio
+     mov ah,09 
+     int 21h
+     jmp fin
+
+part2:
+     ;limpiapantallas 
+     modvid
+     limpant
+     ;muestra menu suma
+     mov dx,offset titR
+     mov ah,09
+     int 21h 
+     
+     mov dx,offset op1_1
+     mov ah,09 
+     int 21h   
+      ;----- num1   
+      ; Lee el primer dígito (unidades)
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    sub al, '0' ; Convierte el carácter a número
+    mov n1, al
+
+    ; Multiplica el número por 10 (parte de las decenas)
+    mov ah, 0
+    mov al, 10
+    mul n1
+    mov n1, al
+
+    ; Lee el segundo dígito (decenas)
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    sub al, '0' ; Convierte el carácter a número
+
+    ; Suma las partes de las decenas y unidades;+++++++++++++++++++
+    add n1, al
+
+    ; Muestra el número ingresado
+    mov ah, 2
+    mov dl, n1                               ;++++++++++++++++++++
+    add dl, '0' ; Convierte el número a carácter
+   ; int 21h
+     ;------ 
+     ;deja un spacio
+     mov dx,offset espacio
+     mov ah,09 
+     int 21h  
+
+     mov dx,offset op2_1
+     mov ah,09 
+     int 21h 
+     ;pide segundo numero
+      ;------num2
+    
+     
+      ; Lee el primer dígito (unidades) 
+      
+      
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    sub al, '0' ; Convierte el carácter a número
+    mov n2, al
+
+    ; Multiplica el número por 10 (parte de las decenas)
+    mov ah, 0
+    mov al, 10
+    mul n2 
+    sub ax,3030h; ajuste decimal
+    mov n2, al
+
+    ; Lee el segundo dígito (decenas)
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    ;sub al, '0' ; Convierte el carácter a número
+
+    ; Suma las partes de las decenas y unidades;+++++++++++++++++++
+    add n2, al
+
+    ; Muestra el número ingresado
+    mov ah, 2
+    mov dl, n2                               ;++++++++++++++++++++
+   ; add dl, '0' ; Convierte el número a carácter
+   ; int 21h
+    
+     ;---------
+     ;deja un espacio
+     mov dx,offset espacio
+     mov ah,09 
+     int 21h   
+     ;muestra resultado
+     mov dx,offset op3_1
+     mov ah,09 
+     int 21h 
+     
+     mov al,num1
+     add al,num2
+     mov result,al
+     add result, '0'
+     mov dl,result
+     mov ah,02h
+     int 21h
+     ;deja un espacio
+     mov dx,offset espacio
+     mov ah,09 
+     int 21h
+     jmp fin
+     
+part3:
+     ;limpiapantallas 
+     modvid
+     limpant
+     ;muestra menu suma
+     mov dx,offset titM
+     mov ah,09
+     int 21h 
+     
+     mov dx,offset op1_1
+     mov ah,09 
+     int 21h   
+      ;----- num1   
+      ; Lee el primer dígito (unidades)
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    sub al, '0' ; Convierte el carácter a número
+    mov n1, al
+
+    ; Multiplica el número por 10 (parte de las decenas)
+    mov ah, 0
+    mov al, 10
+    mul n1
+    mov n1, al
+
+    ; Lee el segundo dígito (decenas)
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    sub al, '0' ; Convierte el carácter a número
+
+    ; Suma las partes de las decenas y unidades;+++++++++++++++++++
+    add n1, al
+
+    ; Muestra el número ingresado
+    mov ah, 2
+    mov dl, n1                               ;++++++++++++++++++++
+    add dl, '0' ; Convierte el número a carácter
+   ; int 21h
+     ;------ 
+     ;deja un spacio
+     mov dx,offset espacio
+     mov ah,09 
+     int 21h  
+
+     mov dx,offset op2_1
+     mov ah,09 
+     int 21h 
+     ;pide segundo numero
+     ;------num2
+    
+     
+      ; Lee el primer dígito (unidades) 
+      
+      
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    sub al, '0' ; Convierte el carácter a número
+    mov n2, al
+
+    ; Multiplica el número por 10 (parte de las decenas)
+    mov ah, 0
+    mov al, 10
+    mul n2 
+    sub ax,3030h; ajuste decimal
+    mov n2, al
+
+    ; Lee el segundo dígito (decenas)
+    mov ah, 1
+    int 21h ; Lee el carácter ingresado
+    ;sub al, '0' ; Convierte el carácter a número
+
+    ; Suma las partes de las decenas y unidades;+++++++++++++++++++
+    add n2, al
+
+    ; Muestra el número ingresado
+    mov ah, 2
+    mov dl, n2                               ;++++++++++++++++++++
+   ; add dl, '0' ; Convierte el número a carácter
+   ; int 21h
+    
+     ;---------
+     ;deja un espacio
+     mov dx,offset espacio
+     mov ah,09 
+     int 21h   
+     ;muestra resultado
+     mov dx,offset op3_1
+     mov ah,09 
+     int 21h 
+     
+     mov al,num1
+     add al,num2
+     mov result,al
+     ;??????????????????????????????????'' 
+     mov dx,offset result
+     ;add result, '0'  
+     mov ah,09h
+     mov dl,result
+     mov ah,02h
+     int 21h
+     ;deja un espacio
+     mov dx,offset espacio
+     mov ah,09 
+     int 21h 
+     jmp fin
+ 
+fin:
+     ;muestra si deseamos continuar
+     mov dx,offset endPrompt
+     mov ah,09 
+    ; int 21h 
+    
+    mov ah, 4ch
+    int 21h
+    
+    main endp
+    end main
